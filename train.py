@@ -55,10 +55,7 @@ def main_worker(gpu, ngpus_per_node, args):
             print("=> information will be saved in {}".format(args.save_path))
         args.save_path.makedirs_p()
         torch.manual_seed(args.seed)
-    else:
-        model = LDRN(args)
-        device = torch.device('cpu')
-        model.to(device)
+
 
     ##############################    Data loading part    ################################
     if args.dataset == 'KITTI':
@@ -98,6 +95,9 @@ def main_worker(gpu, ngpus_per_node, args):
     if (args.rank == 0):
         print("=> creating model")
     Model = LDRN(args)
+    if(args.use_cpu):
+        device = torch.device('cpu')
+        Model.to(device)
     ############################### Number of model parameters ##############################
     num_params_encoder = 0
     num_params_decoder = 0
@@ -131,8 +131,12 @@ def main_worker(gpu, ngpus_per_node, args):
         print("=> Model Initialized - DataParallel")
         enc_param = Model.module.encoder.parameters()
         dec_param = Model.module.decoder.parameters()
+    elif args.use_cpu:
+        print("=> Model Initialized on CPU: {}"))
+        enc_param = Model.encoder.parameters()
+        dec_param = Model.decoder.parameters()
     else:
-       # Model = Model.cuda(args.gpu)
+        Model = Model.cuda(args.gpu)
         print("=> Model Initialized on GPU: {} - Single GPU training".format(args.gpu))
         enc_param = Model.encoder.parameters()
         dec_param = Model.decoder.parameters()
