@@ -26,7 +26,7 @@ from trainer import validate, train_net
 from model import LDRN
 
 def main_worker(gpu, ngpus_per_node, args):
-    if(use_cpu==False)
+    if(args.use_cpu==False):
         args.gpu = gpu
         args.multigpu = False
         if args.distributed:
@@ -56,11 +56,7 @@ def main_worker(gpu, ngpus_per_node, args):
         args.save_path.makedirs_p()
         torch.manual_seed(args.seed)
     else:
-        args.gpu = cpu
-        model = BtsModel(args)
-        model.train()
-        model.decoder.apply(weights_init_xavier)
-        set_misc(model)
+        model = LDRN(args)
         device = torch.device('cpu')
         model.to(device)
 
@@ -136,7 +132,7 @@ def main_worker(gpu, ngpus_per_node, args):
         enc_param = Model.module.encoder.parameters()
         dec_param = Model.module.decoder.parameters()
     else:
-        Model = Model.cuda(args.gpu)
+       # Model = Model.cuda(args.gpu)
         print("=> Model Initialized on GPU: {} - Single GPU training".format(args.gpu))
         enc_param = Model.encoder.parameters()
         dec_param = Model.decoder.parameters()
