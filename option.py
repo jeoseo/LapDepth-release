@@ -60,5 +60,6 @@ parser.add_argument('--multiprocessing_distributed',           help='Use multi-p
                                                                     'N processes per node, which has N GPUs. This is the '
                                                                     'fastest way to use PyTorch for either single node or '
                                                                     'multi node data parallel training', action='store_true',)
+parser.add_argument('--use_cpu', type=bool, default=False) 
 
 args = parser.parse_args()

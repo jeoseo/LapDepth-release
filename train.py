@@ -1,5 +1,4 @@
-import sys
-sys.path.append('/scratch/seoj4/installations')
+
 from option import args, parser
 import csv
 import numpy as np
@@ -27,34 +26,43 @@ from trainer import validate, train_net
 from model import LDRN
 
 def main_worker(gpu, ngpus_per_node, args):
-    args.gpu = gpu
-    args.multigpu = False
-    if args.distributed:
-        args.multigpu = True
-        args.rank = args.rank * ngpus_per_node + gpu
-        dist.init_process_group(backend=args.dist_backend, init_method=args.dist_url,
-                                 world_size=args.world_size, rank=args.rank)
-        args.batch_size = int(args.batch_size/ngpus_per_node)
-        args.workers = int((args.num_workers + ngpus_per_node - 1)/ngpus_per_node)
-        print("==> gpu:",args.gpu,", rank:",args.rank,", batch_size:",args.batch_size,", workers:",args.workers)
-        torch.cuda.set_device(args.gpu)
-    elif args.gpu is None:
-        print("==> DataParallel Training")
-        args.multigpu = True
-        os.environ["CUDA_VISIBLE_DEVICES"]= args.gpu_num
-    else:
-        print("==> Single GPU Training")
-        torch.cuda.set_device(args.gpu)
+    if(use_cpu==False)
+        args.gpu = gpu
+        args.multigpu = False
+        if args.distributed:
+            args.multigpu = True
+            args.rank = args.rank * ngpus_per_node + gpu
+            dist.init_process_group(backend=args.dist_backend, init_method=args.dist_url,
+                                    world_size=args.world_size, rank=args.rank)
+            args.batch_size = int(args.batch_size/ngpus_per_node)
+            args.workers = int((args.num_workers + ngpus_per_node - 1)/ngpus_per_node)
+            print("==> gpu:",args.gpu,", rank:",args.rank,", batch_size:",args.batch_size,", workers:",args.workers)
+            torch.cuda.set_device(args.gpu)
+        elif args.gpu is None:
+            print("==> DataParallel Training")
+            args.multigpu = True
+            os.environ["CUDA_VISIBLE_DEVICES"]= args.gpu_num
+        else:
+            print("==> Single GPU Training")
+            torch.cuda.set_device(args.gpu)
 
-    assert torch.backends.cudnn.enabled, "Amp requires cudnn backend to be enabled."
-        
-    save_path = save_path_formatter(args, parser)
-    args.save_path = 'checkpoints'/save_path
-    if (args.rank == 0):
-        print('=> number of GPU: ',args.gpu_num)
-        print("=> information will be saved in {}".format(args.save_path))
-    args.save_path.makedirs_p()
-    torch.manual_seed(args.seed)
+        assert torch.backends.cudnn.enabled, "Amp requires cudnn backend to be enabled."
+            
+        save_path = save_path_formatter(args, parser)
+        args.save_path = 'checkpoints'/save_path
+        if (args.rank == 0):
+            print('=> number of GPU: ',args.gpu_num)
+            print("=> information will be saved in {}".format(args.save_path))
+        args.save_path.makedirs_p()
+        torch.manual_seed(args.seed)
+    else:
+        args.gpu = cpu
+        model = BtsModel(args)
+        model.train()
+        model.decoder.apply(weights_init_xavier)
+        set_misc(model)
+        device = torch.device('cpu')
+        model.to(device)
 
     ##############################    Data loading part    ################################
     if args.dataset == 'KITTI':
