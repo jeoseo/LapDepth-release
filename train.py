@@ -1,3 +1,5 @@
+import sys
+sys.path.append('/scratch/seoj4/installations')
 from option import args, parser
 import csv
 import numpy as np
