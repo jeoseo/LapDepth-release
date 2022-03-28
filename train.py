@@ -111,7 +111,7 @@ def main_worker(gpu, ngpus_per_node, args):
         print("model decoder parameters: ", num_params_decoder)
         print("Total parameters: {}".format(num_params_encoder + num_params_decoder))
         trainable_params = sum([np.prod(p.shape) for p in Model.parameters() if p.requires_grad])
-        print("Total trainable parameters: {}".format(trainable_params))asdfasdf
+        print("Total trainable parameters: {}".format(trainable_params))
         print("===============================================")
     ############################### apex distributed package wrapping ########################
     if args.distributed:
@@ -132,7 +132,7 @@ def main_worker(gpu, ngpus_per_node, args):
         enc_param = Model.module.encoder.parameters()
         dec_param = Model.module.decoder.parameters()
     elif args.use_cpu:
-        print("=> Model Initialized on CPU: {}"))
+        print("=> Model Initialized on CPU: {}")
         enc_param = Model.encoder.parameters()
         dec_param = Model.decoder.parameters()
     else:
