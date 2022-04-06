@@ -48,8 +48,8 @@ def main_worker(gpu, ngpus_per_node, args):
 
         assert torch.backends.cudnn.enabled, "Amp requires cudnn backend to be enabled."
             
-        #save_path = save_path_formatter(args, parser)
-        args.save_path = os.path.join('','/lapdepth_asdf')
+        save_path = save_path_formatter(args, parser)
+        args.save_path = 'checkpoints'/save_path
         if (args.rank == 0):
             print('=> number of GPU: ',args.gpu_num)
             print("=> information will be saved in {}".format(args.save_path))
