@@ -136,10 +136,11 @@ def main_worker(gpu, ngpus_per_node, args):
         enc_param = Model.encoder.parameters()
         dec_param = Model.decoder.parameters()
     else:
-        Model = Model.cuda(args.gpu)
-        print("=> Model Initialized on GPU: {} - Single GPU training".format(args.gpu))
-        enc_param = Model.encoder.parameters()
-        dec_param = Model.decoder.parameters()
+        Model = Model.cuda()
+        Model = torch.nn.DataParallel(Model)
+        print("=> Model Initialized - DataParallel")
+        enc_param = Model.module.encoder.parameters()
+        dec_param = Model.module.decoder.parameters()
     
     ###########################################################################################
 
